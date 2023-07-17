@@ -75,6 +75,6 @@ def sidebar(default_model):
                 del st.session_state["api_key"]
                 st.experimental_rerun()
         st.markdown(
-            "Si puedes, [comprame un café](https://bmc.link/alonsosilva)"
+            "Si puedes, [cómprame un café](https://bmc.link/alonsosilva)"
         )
     return api_key, selected_model
