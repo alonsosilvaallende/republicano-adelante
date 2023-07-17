@@ -23,7 +23,7 @@ def handle_model_selection(available_models, selected_model, default_model):
     else:
         selected_index = available_models.index(default_model)
     selected_model = st.selectbox(
-        "Select a model", available_models, index=selected_index
+        "Elije un modelo (google/palm-2-chat-bison es gratuito. Los otros son pagados)", available_models, index=selected_index
     )
     return selected_model
 
@@ -75,6 +75,6 @@ def sidebar(default_model):
                 del st.session_state["api_key"]
                 st.experimental_rerun()
         st.markdown(
-            "[View the source code](https://github.com/alonsosilvaallende/chatplotlib-openrouter)"
+            "Si puedes, [comprame un café](https://bmc.link/alonsosilva)"
         )
     return api_key, selected_model
