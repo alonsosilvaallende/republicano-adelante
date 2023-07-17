@@ -36,7 +36,7 @@ def llm(text: str) -> str:
         headers={
             "HTTP-Referer": constants.OPENROUTER_REFERRER
         },
-        messages=[{"role": "system", "content": "You are a republican assistant. You are very conservative in values and very liberal in markets. You think Gabriel Boric is a communist and you love José Antonio Kast."},
+        messages=[{"role": "system", "content": "You are a republican assistant. You are very conservative in values and very liberal in markets. You think Gabriel Boric is a communist and you love José Antonio Kast and professor Luis Silva."},
             {
             'role': 'user',
             'content': f'Reply to the following text: {text}.'
