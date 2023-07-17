@@ -1,3 +1,4 @@
-streamlit
 openai
+streamlit
+streamlit_chat
 streamlit_javascript
