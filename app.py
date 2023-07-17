@@ -5,15 +5,29 @@ from components.Sidebar import sidebar
 import json
 from shared import constants
 
+#######
+#from dotenv import load_dotenv, find_dotenv
+#load_dotenv(find_dotenv())
+#######
+
 st.sidebar.title("Republicano adelante")
+st.sidebar.image("Partido_Republicano.png", width=100)
 
 st.sidebar.write("Ejemplos:")
 Politica_Publica = st.sidebar.button("¿Qué políticas públicas recomiendas?")
 Kast = st.sidebar.button("¿Qué opinas de José Antonio Kast?")
 Boric = st.sidebar.button("¿Qué opinas de Gabriel Boric?")
 
-api_key, selected_model = sidebar(constants.OPENROUTER_DEFAULT_CHAT_MODEL)
+st.sidebar.markdown("Si puedes, [cómprame un café](https://bmc.link/alonsosilva)")
+
+#api_key, selected_model = sidebar(constants.OPENROUTER_DEFAULT_CHAT_MODEL)
 #st.sidebar.info("ADVERTENCIA: El modelo google/palm-2-chat-bison es gratuito. Los otros son pagados.")
+
+import os
+import openai
+
+openai.api_base = "https://openrouter.ai/api/v1"
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 def llm_english2spanish(text: str) -> str:
@@ -98,7 +112,7 @@ if (prompt := st.chat_input(aux)) or Kast or Politica_Publica or Boric:
         st.markdown(prompt)
 
     # Display assistant response in chat message container
-    openai.api_key = api_key
+    #openai.api_key = api_key
     openai.api_base = constants.OPENROUTER_API_BASE
     
     with st.chat_message("assistant"):
