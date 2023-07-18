@@ -2,8 +2,8 @@ import openai
 import streamlit as st
 
 #######
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
+#from dotenv import load_dotenv, find_dotenv
+#load_dotenv(find_dotenv())
 #######
 
 st.sidebar.title("Republicano adelante")
