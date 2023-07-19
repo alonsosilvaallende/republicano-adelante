@@ -93,7 +93,10 @@ def my_response(llm, text: str) -> str:
 
 def my_chain(text: str) -> str:
     aux1 = my_response(llm_spanish2english, text)
-    aux2 = my_response(llm, aux1)
+    if "I'm not able to help" in aux1:
+        aux2 = aux1
+    else:
+        aux2 = my_response(llm, aux1)
     aux3 = my_response(llm_english2spanish, aux2)
     return aux3
 
