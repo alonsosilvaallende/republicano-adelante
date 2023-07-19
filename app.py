@@ -18,11 +18,13 @@ st.sidebar.markdown("Si puedes, [cómprame un café](https://bmc.link/alonsosilv
 
 import os
 import openai
+from retry import retry
 
 openai.api_base = "https://openrouter.ai/api/v1"
 openai.api_key = os.getenv("OPENAI_API_KEY")
 OPENROUTER_REFERRER = "https://github.com/alonsosilvaallende/langchain-streamlit"
 
+@retry(tries=10, delay=1, backoff=2, max_delay=4)
 def llm_english2spanish(text: str) -> str:
     return openai.ChatCompletion.create(
         model='google/palm-2-chat-bison',
@@ -42,6 +44,7 @@ def llm_english2spanish(text: str) -> str:
         temperature=0).choices[0].message.content
 
 
+@retry(tries=10, delay=1, backoff=2, max_delay=4)
 def llm(text: str) -> str:
     return openai.ChatCompletion.create(
         model='google/palm-2-chat-bison',
@@ -60,6 +63,7 @@ def llm(text: str) -> str:
         ],
         temperature=2).choices[0].message.content
 
+@retry(tries=10, delay=1, backoff=2, max_delay=4)
 def llm_spanish2english(text: str) -> str:
     return openai.ChatCompletion.create(
         model='google/palm-2-chat-bison',
@@ -78,16 +82,19 @@ def llm_spanish2english(text: str) -> str:
         ],
         temperature=0).choices[0].message.content
 
+
+def my_response(llm, text: str) -> str:
+    aux = llm(text)
+    counter = 0
+    while ("I'm not able to help" in aux) and counter<3:
+        counter += 1
+        aux = llm(text)
+    return aux
+
 def my_chain(text: str) -> str:
-    aux1 = llm_spanish2english(text)
-    while "I'm not able to help" in aux1:
-        aux1 = llm_spanish2english(text)
-    aux2 = llm(aux1)
-    while "I'm not able to help" in aux2:
-        aux2 = llm(aux1)
-    aux3 = llm_english2spanish(aux2)
-    while "I'm not able to help" in aux3:
-        aux3 = llm_english2spanish(aux2)
+    aux1 = my_response(llm_spanish2english, text)
+    aux2 = my_response(llm, aux1)
+    aux3 = my_response(llm_english2spanish, aux2)
     return aux3
 
 # Initialize chat history
