@@ -38,7 +38,7 @@ def llm_english2spanish(text: str) -> str:
             },
             {
                 'role': 'user',
-                'content': f'Translate the following text to Spanish: {text}. Please add emojis related to the text at the end'
+                'content': f'Translate the following text to Spanish and add emojis related to the text at the end: {text}.'
             }
         ],
         temperature=0).choices[0].message.content
