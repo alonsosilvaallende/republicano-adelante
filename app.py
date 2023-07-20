@@ -68,7 +68,7 @@ from langchain.chat_models import ChatOpenAI
 
 llm = ChatOpenAI(model_name="google/palm-2-chat-bison",
                  streaming=True,
-                 temperature=0,
+                 temperature=2,
                  headers={"HTTP-Referer": OPENROUTER_REFERRER})
 
 from langchain.chains import ConversationChain
