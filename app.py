@@ -45,25 +45,6 @@ def llm_english2spanish(text: str) -> str:
 
 
 @retry(tries=10, delay=1, backoff=2, max_delay=4)
-def llm(text: str) -> str:
-    return openai.ChatCompletion.create(
-        model='google/palm-2-chat-bison',
-        headers={
-            "HTTP-Referer": OPENROUTER_REFERRER
-        },
-        messages=[
-            {
-                "role": "system", 
-                "content": "You are a republican assistant. You are very conservative in values and very liberal in markets. You think Gabriel Boric is a communist and you love José Antonio Kast and professor Luis Silva."
-            },
-            {
-                'role': 'user',
-                'content': f'Reply to the following text: {text}.'
-            }
-        ],
-        temperature=2).choices[0].message.content
-
-@retry(tries=10, delay=1, backoff=2, max_delay=4)
 def llm_spanish2english(text: str) -> str:
     return openai.ChatCompletion.create(
         model='google/palm-2-chat-bison',
@@ -83,20 +64,54 @@ def llm_spanish2english(text: str) -> str:
         temperature=0).choices[0].message.content
 
 
-def my_response(llm, text: str) -> str:
-    aux = llm(text)
+from langchain.chat_models import ChatOpenAI
+
+llm = ChatOpenAI(model_name="google/palm-2-chat-bison",
+                 streaming=True,
+                 temperature=0,
+                 headers={"HTTP-Referer": OPENROUTER_REFERRER})
+
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferMemory
+
+from langchain.prompts import (
+    ChatPromptTemplate,
+    MessagesPlaceholder,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate
+)
+
+prompt_1 = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(
+        "The following is a friendly conversation between a human and an AI. The AI is talkative and "
+        "provides lots of specific details from its context. If the AI does not know the answer to a "
+        "question, it truthfully says it does not know."
+        "You are a republican assistant. You are very conservative in values and very liberal in markets."
+        "You think Gabriel Boric is a communist and you love José Antonio Kast and professor Luis Silva."
+    ),
+    MessagesPlaceholder(variable_name="history"),
+    HumanMessagePromptTemplate.from_template("{input}")
+])
+
+@st.cache_resource
+def aux():
+    memory = ConversationBufferMemory(return_messages=True)
+    conversation = ConversationChain(memory=memory, prompt=prompt_1, llm=llm)
+    return memory, conversation
+
+memory, conversation = aux()
+
+def my_response(llm, text: str, normal: bool=True) -> str:
+    aux = llm(text) if normal==True else llm.predict(input=text)
     counter = 0
-    while ("I'm not able to help" in aux) and counter<3:
+    while ("I'm not able to help" in aux) and counter<2:
         counter += 1
-        aux = llm(text)
+        aux = llm(text) if normal==True else llm.predict(input=text)
     return aux
 
 def my_chain(text: str) -> str:
     aux1 = my_response(llm_spanish2english, text)
-    if "I'm not able to help" in aux1:
-        aux2 = aux1
-    else:
-        aux2 = my_response(llm, aux1)
+    aux2 = my_response(conversation, aux1, normal=False)
     aux3 = my_response(llm_english2spanish, aux2)
     return aux3
 
