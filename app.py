@@ -124,6 +124,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+from gtts import gTTS
 # Accept user input or example
 if (prompt := st.chat_input("Tu mensaje")) or Politica_Publica or Kast  or Boric:
     if Kast:
@@ -142,4 +143,9 @@ if (prompt := st.chat_input("Tu mensaje")) or Politica_Publica or Kast  or Boric
         message_placeholder = st.empty()
         full_response = my_chain(prompt)
         message_placeholder.markdown(full_response)
+        tts = gTTS(f"{full_response[:-1]}", lang='es', tld='co.ve')
+        tts.save("./hola.mp3")
+        audio_file = open('./hola.mp3', 'rb')
+        audio_bytes = audio_file.read()
+        st.audio(audio_bytes, format='audio/ogg')
     st.session_state.messages.append({"role": "assistant", "content": full_response})
